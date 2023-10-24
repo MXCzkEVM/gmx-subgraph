@@ -67,6 +67,12 @@ type Order @entity {
   executedTxn: Transaction
 }
 
+type TokenPrice @entity {
+  id: ID!
+  min: BigInt!
+  max: BigInt!
+}
+
 type PositionIncrease @entity(immutable: true) {
   # orderKey
   id: ID!
@@ -90,7 +96,8 @@ type PositionIncrease @entity(immutable: true) {
   longTokenFundingAmountPerSize: BigInt!
   shortTokenFundingAmountPerSize: BigInt!
   priceImpactAmount: BigInt!
-  pnlUsd: BigInt!
+  priceImpactUsd: BigInt!
+  basePnlUsd: BigInt!
   isLong: Boolean!
 
   transaction: Transaction
@@ -114,12 +121,13 @@ type PositionDecrease @entity(immutable: true) {
   collateralDeltaAmount: BigInt!
   executionPrice: BigInt!
   priceImpactDiffUsd: BigInt!
+  priceImpactUsd: BigInt!
   orderType: BigInt!
   borrowingFactor: BigInt!
   longTokenFundingAmountPerSize: BigInt!
   shortTokenFundingAmountPerSize: BigInt!
   priceImpactAmount: BigInt!
-  pnlUsd: BigInt!
+  basePnlUsd: BigInt!
   isLong: Boolean!
 
   transaction: Transaction
@@ -176,7 +184,9 @@ type SwapFeesInfo @entity(immutable: true) {
   id: ID!
   marketAddress: String!
   tokenAddress: String!
-  action: String!
+
+  swapFeeType: String!
+
   tokenPrice: BigInt!
   feeReceiverAmount: BigInt!
   feeAmountForPool: BigInt!
@@ -218,7 +228,10 @@ type TradeAction @entity(immutable: true) {
   executionPrice: BigInt
   collateralTokenPriceMin: BigInt
   collateralTokenPriceMax: BigInt
+  indexTokenPriceMin: BigInt
+  indexTokenPriceMax: BigInt
   priceImpactDiffUsd: BigInt
+  priceImpactUsd: BigInt
   priceImpactAmount: BigInt
   positionFeeAmount: BigInt
   borrowingFeeAmount: BigInt
@@ -266,4 +279,88 @@ type Transaction @entity {
   timestamp: Int!
   blockNumber: Int!
   transactionIndex: Int!
+}
+
+type MarketInfo @entity {
+  id: ID!
+  marketToken: String!
+  indexToken: String!
+  longToken: String!
+  shortToken: String!
+}
+
+type VolumeInfo @entity {
+  id: ID!
+  period: String!
+  volumeUsd: BigInt!
+  marginVolumeUsd: BigInt!
+  swapVolumeUsd: BigInt!
+  depositVolumeUsd: BigInt!
+  withdrawalVolumeUsd: BigInt!
+}
+
+type SwapVolumeInfo @entity {
+  # tokenIn:tokenOut:timestamp
+  id: ID!
+  period: String!
+  tokenIn: String!
+  tokenOut: String!
+  timestamp: Int!
+  volumeUsd: BigInt!
+}
+
+type PositionVolumeInfo @entity {
+  # collateralToken:indexToken:timestamp
+  id: ID!
+  period: String!
+  collateralToken: String!
+  indexToken: String!
+  timestamp: Int!
+  volumeUsd: BigInt!
+}
+
+type User @entity {
+  # account address
+  id: ID!
+  account: String!
+
+  totalSwapCount: Int!
+  totalPositionCount: Int!
+  totalDepositCount: Int!
+  totalWithdrawalCount: Int!
+}
+
+type UserStat @entity {
+  # timestamp | total
+  id: ID!
+  totalSwapCount: Int!
+  totalPositionCount: Int!
+  totalDepositCount: Int!
+  totalWithdrawalCount: Int!
+
+  period: String!
+  uniqueUsers: Int!
+}
+
+type SwapFeesInfoWithPeriod @entity {
+  # timestamp | total
+  id: ID!
+  period: String!
+  totalFeeReceiverAmount: BigInt!
+  totalFeeAmountForPool: BigInt!
+
+  totalFeeReceiverUsd: BigInt!
+  totalFeeUsdForPool: BigInt!
+}
+
+type PositionFeesInfoWithPeriod @entity {
+  # timestamp | total
+  id: ID!
+  period: String!
+  totalPositionFeeAmountForPool: BigInt!
+  totalPositionFeeUsdForPool: BigInt!
+
+  totalPositionFeeAmount: BigInt!
+  totalPositionFeeUsd: BigInt!
+  totalBorrowingFeeUsd: BigInt!
 }
